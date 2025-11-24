@@ -1,0 +1,17 @@
+[run]
+branch = True
+source =
+    pico_pydantic
+omit =
+    */_version.py
+
+[paths]
+pico_pydantic =
+    src/pico_pydantic
+    .tox/*/lib/*/site-packages/pico_pydantic
+    .tox/*/site-packages/pico_pydantic
+    */site-packages/pico_pydantic
+
+[report]
+show_missing = True
+
