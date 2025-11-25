@@ -7,10 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.h
 
 ---
 
+## [0.2.0] - 2025-11-25
+
+### Added
+- **Pico-Stack Integration:** Added `pico_stack.modules` entry point for automatic discovery.  
+  `pico-fastapi` now loads automatically when using `pico-stack`, removing the need to manually include `"pico_fastapi"` in the module list.
+
+### Changed
+- Updated documentation and examples to use the new **pico-stack auto-discovery** workflow by default.
+
+---
+
 ## [0.1.0]
 
 ### Added
-
 * **Initial public release** of `pico-pydantic`.
 * **`@validate`** decorator providing annotation-driven validation for methods of IoC-managed components.
 * **`ValidationInterceptor`** implementing **AOP-based argument validation** for methods decorated with `@validate`.
