@@ -92,16 +92,16 @@ class InventoryService:
 
 ```python
 import asyncio
-from pico_ioc import init, DictSource, configuration
+from pico_ioc import DictSource, configuration
+from pico_stack import init, DictSource, configuration
 from pico_pydantic import ValidationFailedError
 
 # Define the base configuration (optional)
 config = configuration(DictSource({}))
 
-# Initialize the container, registering pico_pydantic and your components
 # 'components' is used here as the module containing InventoryService.
 container = init(
-    modules=["pico_pydantic", "components"],
+    modules=["components"],
     config=config,
 )
 
