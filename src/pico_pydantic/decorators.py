@@ -1,8 +1,6 @@
-from typing import Callable, ParamSpec, TypeVar
-from functools import wraps
+from typing import Callable, TypeVar
 
-P = ParamSpec("P")
-R = TypeVar("R")
+T = TypeVar("T", bound=Callable)
 
 VALIDATE_META = "_pico_pydantic_validate_meta"
 
@@ -12,9 +10,6 @@ class ValidationFailedError(ValueError):
         self.pydantic_error = pydantic_error
         super().__init__(f"Validation failed for method '{method_name}': {pydantic_error}")
 
-def validate(func: Callable[P, R]) -> Callable[P, R]:
+def validate(func: T) -> T:
     setattr(func, VALIDATE_META, True)
-    @wraps(func)
-    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        return func(*args, **kwargs)
-    return wrapper
+    return func
