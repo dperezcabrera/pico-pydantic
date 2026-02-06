@@ -3,7 +3,7 @@
 [![PyPI](https://img.shields.io/pypi/v/pico-pydantic.svg)](https://pypi.org/project/pico-pydantic/)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/dperezcabrera/pico-pydantic)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-![CI (tox matrix)](https://github.com/dperezcabrera/pico-ioc/actions/workflows/ci.yml/badge.svg)
+![CI (tox matrix)](https://github.com/dperezcabrera/pico-pydantic/actions/workflows/ci.yml/badge.svg)
 [![codecov](https://codecov.io/gh/dperezcabrera/pico-pydantic/branch/main/graph/badge.svg)](https://codecov.io/gh/dperezcabrera/pico-pydantic)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=dperezcabrera_pico-pydantic&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=dperezcabrera_pico-pydantic)
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=dperezcabrera_pico-pydantic&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=dperezcabrera_pico-pydantic)
@@ -16,7 +16,7 @@
 
 It uses Pico-IoC's **`MethodInterceptor`** system to perform validation based on Pydantic **`BaseModel`** type hints **before** your method's business logic runs. This is the ideal tool for ensuring arguments passed between IoC-managed services are structurally correct.
 
-> 🐍 Requires Python 3.10+
+> 🐍 Requires Python 3.11+
 > 🧩 Works with Pydantic 2.0+
 > 🔄 Supports async and sync methods
 > 🧪 Enables unit testing of validation separate from business logic
@@ -92,8 +92,7 @@ class InventoryService:
 
 ```python
 import asyncio
-from pico_ioc import DictSource, configuration
-from pico_stack import init, DictSource, configuration
+from pico_ioc import DictSource, configuration, init
 from pico_pydantic import ValidationFailedError
 
 # Define the base configuration (optional)
@@ -170,6 +169,19 @@ No manual checks inside the service method. Logic stays clean.
 ```
 
 -----
+
+## 🤖 Claude Code Skills
+
+This project includes pre-designed skills for [Claude Code](https://claude.ai/claude-code), enabling AI-assisted development with pico-pydantic patterns.
+
+| Skill | Command | Description |
+|-------|---------|-------------|
+| **Pico Validate** | `/pico-validate` | Adds Pydantic validation to pico-ioc components |
+| **Pico Test Generator** | `/pico-tests` | Generates tests for pico-framework components |
+
+See [Skills documentation](docs/skills.md) for full details and installation instructions.
+
+---
 
 ## 📝 License
 

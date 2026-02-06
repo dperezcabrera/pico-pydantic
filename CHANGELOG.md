@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.h
 
 ---
 
+## [0.2.1] - 2025-02-04
+
+### Changed
+- **Code Quality**: Refactored `ValidationInterceptor` to reduce cyclomatic complexity from A(3.375) to A(2.5).
+  - Extracted helper functions: `_bind_arguments`, `_should_skip_param`, `_is_basemodel_class`, `_has_pydantic_in_args`.
+- **Documentation**: Standardized MkDocs configuration with Material theme (indigo), git-revision-date-localized plugin, and math extensions.
+- **CI/CD**: Unified GitHub Actions workflow for documentation deployment.
+
+### Fixed
+- **Test Coverage**: Achieved 100% test coverage for `interceptor.py`.
+
+### Added
+- `tests/test_interceptor_coverage.py`: 8 new tests for `_requires_pydantic_validation` edge cases including exception handling and generic types.
+
+---
+
 ## [0.2.0] - 2025-11-25
 
 ### Added

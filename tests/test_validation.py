@@ -1,5 +1,5 @@
 import pytest
-from typing import List, Optional, Union, Any, Type
+from typing import List, Optional, Union, Type
 from unittest.mock import AsyncMock, Mock
 from pydantic import BaseModel, ValidationError, Field
 from pico_pydantic.decorators import validate, VALIDATE_META, ValidationFailedError
