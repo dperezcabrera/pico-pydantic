@@ -1,7 +1,9 @@
 import inspect
 from typing import Any, Callable
+
 from pico_ioc import MethodCtx, MethodInterceptor, component
-from pydantic import ValidationError, TypeAdapter, BaseModel
+from pydantic import BaseModel, TypeAdapter, ValidationError
+
 from .decorators import VALIDATE_META, ValidationFailedError
 
 
@@ -15,7 +17,7 @@ def _bind_arguments(sig: inspect.Signature, args: tuple, kwargs: dict) -> inspec
 
 def _should_skip_param(name: str, annotation: Any) -> bool:
     """Check if parameter should be skipped for validation."""
-    return name in ('self', 'cls') or annotation == inspect.Parameter.empty
+    return name in ("self", "cls") or annotation == inspect.Parameter.empty
 
 
 def _is_basemodel_class(annotation: Any) -> bool:

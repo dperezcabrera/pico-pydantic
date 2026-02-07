@@ -1,6 +1,9 @@
 """Tests for interceptor.py edge cases and 100% coverage."""
+
+from unittest.mock import MagicMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, MagicMock, patch
+
 from pico_pydantic.interceptor import ValidationInterceptor
 
 
@@ -19,6 +22,7 @@ class TestRequiresPydanticValidation:
                 class BrokenIterator:
                     def __iter__(self):
                         raise RuntimeError("Cannot iterate")
+
                 return BrokenIterator()
 
         result = interceptor._requires_pydantic_validation(BrokenGeneric())
@@ -30,13 +34,13 @@ class TestRequiresPydanticValidation:
 
         # Some special objects raise TypeError on issubclass
         # Use a mock that passes isclass but fails issubclass
-        from unittest.mock import MagicMock, patch
         import inspect
+        from unittest.mock import MagicMock, patch
 
         bad_annotation = MagicMock()
         bad_annotation.__class__ = type  # Make it look like a class
 
-        with patch.object(inspect, 'isclass', return_value=True):
+        with patch.object(inspect, "isclass", return_value=True):
             # issubclass will fail on MagicMock
             result = interceptor._requires_pydantic_validation(bad_annotation)
             assert result is False
@@ -67,6 +71,7 @@ class TestRequiresPydanticValidation:
     def test_returns_true_for_generic_containing_basemodel(self):
         """Returns True for generic types containing BaseModel."""
         from typing import List, Optional
+
         from pydantic import BaseModel
 
         class MyModel(BaseModel):
