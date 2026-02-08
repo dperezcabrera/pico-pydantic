@@ -170,16 +170,23 @@ No manual checks inside the service method. Logic stays clean.
 
 -----
 
-## 🤖 Claude Code Skills
+## Claude Code Skills
 
-This project includes pre-designed skills for [Claude Code](https://claude.ai/claude-code), enabling AI-assisted development with pico-pydantic patterns.
+Install [Claude Code](https://code.claude.com) skills for AI-assisted development with pico-pydantic:
 
-| Skill | Command | Description |
-|-------|---------|-------------|
-| **Pico Validate** | `/pico-validate` | Adds Pydantic validation to pico-ioc components |
-| **Pico Test Generator** | `/pico-tests` | Generates tests for pico-framework components |
+```bash
+curl -sL https://raw.githubusercontent.com/dperezcabrera/pico-skills/main/install.sh | bash -s -- pydantic
+```
 
-See [Skills documentation](docs/skills.md) for full details and installation instructions.
+| Command | Description |
+|---------|-------------|
+| `/add-validation` | Add Pydantic validation to component methods |
+| `/add-component` | Add components, factories, interceptors, settings |
+| `/add-tests` | Generate tests for pico-framework components |
+
+All skills: `curl -sL https://raw.githubusercontent.com/dperezcabrera/pico-skills/main/install.sh | bash`
+
+See [pico-skills](https://github.com/dperezcabrera/pico-skills) for details.
 
 ---
 
