@@ -102,6 +102,65 @@ Method Call (args, kwargs)
 
 ```
 
+### Validation Interceptor Flow (Mermaid)
+
+```mermaid
+flowchart TD
+    A["Method Call (args, kwargs)"] --> B{"Has @validate marker?"}
+    B -- No --> C["call_next(ctx) -- skip validation"]
+    B -- Yes --> D["inspect.signature(func)"]
+    D --> E["_bind_arguments(sig, args, kwargs)"]
+    E --> F["apply_defaults()"]
+    F --> G["Iterate parameters"]
+    G --> H{"_should_skip_param?\n(self/cls/no annotation)"}
+    H -- Yes --> G
+    H -- No --> I{"_requires_pydantic_validation?\n(BaseModel or generic with BaseModel)"}
+    I -- No --> G
+    I -- Yes --> J["TypeAdapter(annotation).validate_python(value)"]
+    J -- Success --> K["Replace argument with validated value"]
+    K --> G
+    J -- ValidationError --> L["Raise ValidationFailedError\n(wraps pydantic_error + method_name)"]
+    G -- All params done --> M["Update ctx.args and ctx.kwargs"]
+    M --> N["call_next(ctx) -- execute method"]
+    N --> O{"Result is awaitable?"}
+    O -- Yes --> P["await result"]
+    O -- No --> Q["return result"]
+    P --> Q
+    C --> O
+```
+
+### Type Resolution Tree (Mermaid)
+
+```mermaid
+flowchart TD
+    A["annotation"] --> B{"inspect.isclass(annotation)\nand issubclass(annotation, BaseModel)?"}
+    B -- Yes --> C["Return True -- requires validation"]
+    B -- No / Exception --> D{"Has __args__ attribute?"}
+    D -- No --> E["Return False -- no validation needed"]
+    D -- Yes --> F["Iterate annotation.__args__"]
+    F --> G["arg"]
+    G --> H{"_is_basemodel_class(arg)?"}
+    H -- Yes --> C
+    H -- No --> I{"_has_pydantic_in_args(arg, check_func)?"}
+    I -- Yes --> C
+    I -- No --> J{"More args?"}
+    J -- Yes --> G
+    J -- No --> E
+
+    style C fill:#4a4,color:#fff
+    style E fill:#a44,color:#fff
+```
+
+**Examples of type resolution:**
+
+| Annotation               | Resolution Path                                                |
+|:-------------------------|:---------------------------------------------------------------|
+| `UserModel`              | `isclass` + `issubclass(BaseModel)` -- True                   |
+| `List[UserModel]`        | Not a class -- check `__args__` -- `(UserModel,)` -- True     |
+| `Optional[UserModel]`    | `Union[UserModel, None]` -- `__args__` -- `(UserModel, None)` -- True |
+| `Union[str, int]`        | `__args__` -- `(str, int)` -- neither is BaseModel -- False   |
+| `str`                    | Not BaseModel, no `__args__` -- False                         |
+
 ---
 
 ## 4. The Decorator Model (`@validate`)

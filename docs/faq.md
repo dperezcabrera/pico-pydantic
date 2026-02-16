@@ -95,6 +95,8 @@ class MyService:
         ...
 ```
 
+Also verify that the `ValidationInterceptor` is registered. If you use `pico-boot`, it is auto-discovered via the `pico_boot.modules` entry point. If you do not use `pico-boot`, you must register the interceptor manually with the container.
+
 ### Arguments are not being validated
 
 Only parameters with `BaseModel` type hints are validated. Parameters without annotations, or with non-Pydantic types, are passed through:
@@ -107,3 +109,104 @@ async def process(self, data: MyModel, name: str, count):
     # count: passed through (no annotation)
     ...
 ```
+
+---
+
+## Error Reference
+
+This section documents every error message produced by pico-pydantic with its exact text, cause, and fix.
+
+### `ValidationFailedError`
+
+**Exact message format:**
+
+```
+Validation failed for method '<method_name>': <pydantic_error>
+```
+
+**Example output:**
+
+```
+Validation failed for method 'create_user': 1 validation error for UserCreate
+username
+  String should have at least 3 characters [type=string_too_short, input_value='ab', input_type=str]
+```
+
+**Cause:** An argument with a `BaseModel` type hint failed Pydantic validation. The interceptor called `TypeAdapter(annotation).validate_python(value)` and Pydantic raised a `ValidationError`.
+
+**Attributes:**
+
+| Attribute        | Type                          | Description                                    |
+|:-----------------|:------------------------------|:-----------------------------------------------|
+| `method_name`    | `str`                         | Name of the method that failed validation      |
+| `pydantic_error` | `pydantic.ValidationError`    | The original Pydantic error with field details  |
+
+**Fix:** Inspect `e.pydantic_error.errors()` to see which fields failed and why:
+
+```python
+from pico_pydantic import ValidationFailedError
+
+try:
+    await service.create_user({"username": "ab"})
+except ValidationFailedError as e:
+    for error in e.pydantic_error.errors():
+        print(f"Field: {error['loc']}, Message: {error['msg']}")
+```
+
+`ValidationFailedError` inherits from `ValueError`, so it can be caught with `except ValueError` as well.
+
+---
+
+### `TypeError` from argument binding
+
+**Exact message format (Python standard):**
+
+```
+missing a required argument: '<param_name>'
+```
+
+or
+
+```
+got an unexpected keyword argument '<param_name>'
+```
+
+**Cause:** The `_bind_arguments()` helper tries to bind positional and keyword arguments to the method signature. If binding fails even after adjusting for `self`/`cls`, Python raises a `TypeError`.
+
+**Fix:** Ensure the arguments you pass match the method signature (correct number of positional args, correct keyword names).
+
+---
+
+### `TypeAdapter` validation errors
+
+**Exact message format (from Pydantic):**
+
+```
+N validation error(s) for <TypeName>
+<field_name>
+  <error_message> [type=<error_type>, input_value=<value>, input_type=<type>]
+```
+
+**Example:**
+
+```
+2 validation errors for ItemData
+name
+  String should have at least 3 characters [type=string_too_short, input_value='ab', input_type=str]
+price
+  Input should be greater than 0 [type=greater_than, input_value=-5, input_type=int]
+```
+
+**Cause:** `TypeAdapter(annotation).validate_python(value)` found that the input data violates one or more Pydantic field constraints. This error is always wrapped in `ValidationFailedError` by the interceptor, so you will not see a bare `pydantic.ValidationError` unless you bypass the interceptor.
+
+**Fix:** Correct the input data to satisfy the model's field constraints (`Field(min_length=...)`, `Field(gt=...)`, required fields, etc.).
+
+---
+
+### Silent failure on broken generic types
+
+**Symptom:** No `ValidationFailedError` is raised even though the type annotation looks like it should be validated.
+
+**Cause:** The `_requires_pydantic_validation()` method wraps its type-checking logic in a broad `except Exception` handler. If a type annotation has a broken `__args__` iterator or causes `issubclass()` to raise a `TypeError` (common with some typing constructs), the method returns `False` and the argument is silently passed through.
+
+**Fix:** This is by design to avoid crashes on exotic type annotations. If you suspect a type is not being validated, verify that `issubclass(YourType, BaseModel)` works correctly in an interactive Python session. Standard `BaseModel` subclasses and common generics (`List`, `Optional`, `Union`) are fully supported.
