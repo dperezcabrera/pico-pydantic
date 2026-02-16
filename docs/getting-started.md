@@ -39,10 +39,9 @@ class UserService:
 
 ```python
 import asyncio
-from pico_ioc import init, configuration, DictSource
+from pico_boot import init
 
-config = configuration(DictSource({}))
-container = init(modules=["myapp"], config=config)
+container = init(modules=["myapp"])
 
 async def main():
     service = container.get(UserService)
@@ -98,7 +97,7 @@ Arguments without `BaseModel` type hints (e.g. `str`, `int`) are passed through 
 
 ## Auto-Discovery
 
-Pico-Pydantic registers itself via the `pico_boot.modules` entry point. When using `pico-boot` or `pico-stack`, the `ValidationInterceptor` is auto-discovered.
+Pico-Pydantic registers itself via the `pico_boot.modules` entry point. When using `pico-boot`, the `ValidationInterceptor` is auto-discovered.
 
 ## Next Steps
 

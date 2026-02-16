@@ -58,12 +58,6 @@ Pico-Pydantic provides:
 pip install pico-pydantic
 ```
 
-Also install `pico-ioc` and `pydantic`:
-
-```bash
-pip install pico-ioc pydantic
-```
-
 -----
 
 ## 🚀 Quick Example
@@ -92,17 +86,11 @@ class InventoryService:
 
 ```python
 import asyncio
-from pico_ioc import DictSource, configuration, init
+from pico_boot import init
 from pico_pydantic import ValidationFailedError
 
-# Define the base configuration (optional)
-config = configuration(DictSource({}))
-
 # 'components' is used here as the module containing InventoryService.
-container = init(
-    modules=["components"],
-    config=config,
-)
+container = init(modules=["components"])
 
 async def main():
     service = container.get(InventoryService)
@@ -136,7 +124,7 @@ if __name__ == "__main__":
   * When a method decorated with **`@validate`** is called:
   * The interceptor captures the call arguments.
   * It inspects the method signature for arguments with the **`BaseModel`** type hint.
-  * It calls **`BaseModel.model_validate(value)`** on the argument value.
+  * It validates each argument using **`TypeAdapter.validate_python(value)`**.
   * If validation fails, it wraps the error in **`ValidationFailedError`** and stops execution.
   * If successful, **`call_next`** is executed, and the original method runs.
 
@@ -162,7 +150,7 @@ No manual checks inside the service method. Logic stays clean.
                                 │
                  ┌──────────────▼───────────────┐
                  │         pico-pydantic        │
-                 │  Inspect & model_validate()  │
+                 │  Inspect & validate_python()  │
                  └──────────────┬───────────────┘
                                 │
                              Pydantic 2.0+
