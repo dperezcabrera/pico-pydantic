@@ -6,7 +6,8 @@ from pico_ioc import component
 from pydantic import BaseModel
 
 from pico_pydantic.decorators import validate
-from pico_pydantic.interceptor import ValidationInterceptor
+
+from conftest import MockMethodCtx
 
 
 class Item(BaseModel):
@@ -36,19 +37,6 @@ class ComplexService:
     @validate
     def static_method_op(item: Item) -> bool:
         return True
-
-
-class MockMethodCtx:
-    def __init__(self, cls, name, args, kwargs):
-        self.cls = cls
-        self.name = name
-        self.args = args
-        self.kwargs = kwargs
-
-
-@pytest.fixture
-def interceptor():
-    return ValidationInterceptor()
 
 
 @pytest.mark.asyncio
