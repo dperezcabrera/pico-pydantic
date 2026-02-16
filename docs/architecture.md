@@ -17,8 +17,6 @@ Its purpose is to turn Python type hints into **enforced contracts**.
 The library acts as a **Guard Layer** sitting between the caller and your service components.
 
 ```
-
-```
                         ┌───────────────────────────┐
                         │      Caller / Client      │
                         │ (Controller, Test, etc.)  │
@@ -27,8 +25,6 @@ The library acts as a **Guard Layer** sitting between the caller and your servic
                              (Calls Component)
                                       │
                                       ▼
-```
-
 ┌───────────────────────────────────────────────────────────────────────┐
 │                           Pico-IoC Container                          │
 │                                                                       │
@@ -44,7 +40,6 @@ The library acts as a **Guard Layer** sitting between the caller and your servic
 │        │ (Schema Check)  │       (Only if Valid)                      │
 │        └─────────────────┘                                            │
 └───────────────────────────────────────────────────────────────────────┘
-
 ```
 
 ---
@@ -93,7 +88,7 @@ Method Call (args, kwargs)
 │ FOR EACH parameter IN signature:             │
 │   IF type\_hint is Pydantic Model:            │
 │      try:                                    │
-│         Model.model\_validate(value)          │
+│         TypeAdapter.validate\_python(value)   │
 │      except ValidationError:                 │
 │         RAISE ValidationFailedError          │
 └──────────────────────┬───────────────────────┘

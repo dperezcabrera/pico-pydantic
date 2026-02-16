@@ -26,11 +26,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.h
 ## [0.2.0] - 2025-11-25
 
 ### Added
-- **Pico-Stack Integration:** Added `pico_stack.modules` entry point for automatic discovery.  
-  `pico-fastapi` now loads automatically when using `pico-stack`, removing the need to manually include `"pico_fastapi"` in the module list.
+- **Pico-Boot Integration:** Added `pico_boot.modules` entry point for automatic discovery.
+  `pico-pydantic` now loads automatically when using `pico-boot`, removing the need to manually include `"pico_pydantic"` in the module list.
 
 ### Changed
-- Updated documentation and examples to use the new **pico-stack auto-discovery** workflow by default.
+- Updated documentation and examples to use the new **pico-boot auto-discovery** workflow by default.
 
 ---
 
