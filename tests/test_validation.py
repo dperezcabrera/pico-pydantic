@@ -4,9 +4,8 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 from pydantic import BaseModel, Field, ValidationError
 
-from pico_pydantic.decorators import VALIDATE_META, ValidationFailedError, validate
-
 from conftest import MockMethodCtx
+from pico_pydantic.decorators import VALIDATE_META, ValidationFailedError, validate
 
 
 class Item(BaseModel):

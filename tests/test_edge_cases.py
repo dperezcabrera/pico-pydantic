@@ -5,9 +5,8 @@ import pytest
 from pico_ioc import component
 from pydantic import BaseModel
 
-from pico_pydantic.decorators import validate
-
 from conftest import MockMethodCtx
+from pico_pydantic.decorators import validate
 
 
 class Item(BaseModel):
