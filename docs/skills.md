@@ -1,6 +1,6 @@
-# Claude Code Skills
+# AI Coding Skills
 
-[Claude Code](https://code.claude.com) skills for AI-assisted development with pico-pydantic.
+[Claude Code](https://code.claude.com) and [OpenAI Codex](https://openai.com/index/introducing-codex/) skills for AI-assisted development with pico-pydantic.
 
 ## Installation
 
@@ -14,19 +14,42 @@ Or install all pico-framework skills:
 curl -sL https://raw.githubusercontent.com/dperezcabrera/pico-skills/main/install.sh | bash
 ```
 
+### Platform-specific
+
+```bash
+# Claude Code only
+curl -sL https://raw.githubusercontent.com/dperezcabrera/pico-skills/main/install.sh | bash -s -- --claude pydantic
+
+# OpenAI Codex only
+curl -sL https://raw.githubusercontent.com/dperezcabrera/pico-skills/main/install.sh | bash -s -- --codex pydantic
+```
+
 ## Available Commands
 
-| Command | Description |
-|---------|-------------|
-| `/add-validation` | Add Pydantic validation to component methods |
-| `/add-component` | Add components, factories, interceptors, settings |
-| `/add-tests` | Generate tests for pico-framework components |
+### `/add-validation`
 
-## Usage
+Adds Pydantic validation to component methods via AOP. Use when you need automatic input validation on service methods without manual checking.
+
+**How it works:** pico-pydantic's `ValidationInterceptor` inspects type hints with `BaseModel` parameters and validates them automatically before method execution.
 
 ```
 /add-validation UserService
+/add-validation OrderService.create_order
+```
+
+### `/add-component`
+
+Creates a new pico-ioc component with dependency injection. Use when adding services, factories, or interceptors.
+
+```
 /add-component UserService
+```
+
+### `/add-tests`
+
+Generates tests for existing pico-framework components. Creates unit tests with validation error assertions.
+
+```
 /add-tests UserService
 ```
 
