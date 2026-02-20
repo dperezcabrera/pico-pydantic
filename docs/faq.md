@@ -83,19 +83,52 @@ The interceptor checks for the `@validate` marker first. Methods without it are 
 
 ### Validation is not running
 
-Ensure the method is decorated with `@validate`:
+The most common cause: **the component was not resolved from the container.**
+
+`@validate` is a marker — it does nothing on its own. The actual validation
+is performed by the `ValidationInterceptor`, which is part of pico-ioc's
+AOP pipeline. This pipeline only runs for components obtained via
+`container.get()` (or injected by the container into another component).
 
 ```python
-from pico_pydantic import validate
+# Validation runs — interceptor is active
+service = container.get(MyService)
+await service.process({"bad": "data"})    # -> ValidationFailedError
 
-@component
-class MyService:
-    @validate  # Required!
-    async def process(self, data: MyModel):
-        ...
+# Validation does NOT run — no interceptor
+service = MyService()
+await service.process({"bad": "data"})    # -> executes normally
 ```
 
-Also verify that the `ValidationInterceptor` is registered. If you use `pico-boot`, it is auto-discovered via the `pico_boot.modules` entry point. If you do not use `pico-boot`, you must register the interceptor manually with the container.
+If you are getting the service from the container and validation still does
+not run, check these additional causes:
+
+1. **Missing `@validate` on the method:**
+
+    ```python
+    from pico_pydantic import validate
+
+    @component
+    class MyService:
+        @validate  # Required!
+        async def process(self, data: MyModel):
+            ...
+    ```
+
+2. **`ValidationInterceptor` not registered.** If you use `pico-boot`, it
+   is auto-discovered via the `pico_boot.modules` entry point. If you do
+   not use `pico-boot`, add `"pico_pydantic"` to your modules list:
+
+    ```python
+    from pico_ioc import init
+    container = init(modules=["myapp", "pico_pydantic"])
+    ```
+
+3. **The parameter is not a `BaseModel` type.** Only `BaseModel` subclasses
+   (and generics like `List[Model]`, `Optional[Model]`) are validated.
+   Plain types (`str`, `int`) are passed through.
+
+See the [unified troubleshooting guide](https://github.com/dperezcabrera/pico-boot/blob/main/docs/troubleshooting.md) for a complete decision tree.
 
 ### Arguments are not being validated
 
