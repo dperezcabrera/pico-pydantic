@@ -53,6 +53,13 @@ async def main():
 asyncio.run(main())
 ```
 
+> **Important:** `@validate` only runs when the component is resolved from
+> the container (`container.get(UserService)`). If you instantiate the class
+> directly with `UserService()`, validation **will not execute** — the
+> `@validate` marker is invisible without the `ValidationInterceptor` that
+> the container provides. This is by design: it keeps unit tests fast
+> (no container needed) while enforcing contracts in production.
+
 ## Error Handling
 
 Invalid data raises `ValidationFailedError`:

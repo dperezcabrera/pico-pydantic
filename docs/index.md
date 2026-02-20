@@ -29,6 +29,11 @@ class InventoryService:
         return data.model_dump()
 ```
 
+> **Important:** Validation only runs when the component is resolved from
+> the pico-ioc container. If you instantiate the class directly
+> (`InventoryService()`), `@validate` has no effect. See
+> [Getting Started](getting-started.md) for details.
+
 ## Installation
 
 ```bash
