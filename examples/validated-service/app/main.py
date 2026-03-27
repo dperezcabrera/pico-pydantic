@@ -4,7 +4,7 @@ from .services import UserService
 
 
 def main():
-    container = init(modules=["app.services"])
+    container = init(modules=["app"])  # scans recursively
 
     service = container.get(UserService)
 
