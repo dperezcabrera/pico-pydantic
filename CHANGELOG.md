@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.h
 
 ---
 
+## [0.2.2] - 2026-03-27
+
+### Fixed
+- **`@validate` now works in the AOP interceptor chain.** Previously, `@validate` only set a metadata flag but did not attach `ValidationInterceptor` to the method via `@intercepted_by`, so validation never executed at runtime. The decorator now correctly registers the interceptor, enabling dict-to-model conversion and argument validation when combined with other interceptors like `@transactional`.
+- **Signature binding with `self` parameter.** `_validate_and_transform` now strips `self`/`cls` from the method signature before binding arguments, matching how the AOP proxy passes `ctx.args` without the instance.
+
+### Changed
+- Updated tests to reflect the real AOP proxy behavior where `ctx.args` does not include `self`.
+- Updated `CLAUDE.md` to document the `@intercepted_by` usage.
+
+---
+
 ## [0.2.1] - 2025-02-04
 
 ### Changed

@@ -5,7 +5,7 @@ Read and follow ./AGENTS.md for project conventions.
 pico-pydantic provides Pydantic validation integration for pico-ioc. It uses:
 - `@component(scope="singleton")` for ValidationInterceptor
 - `MethodInterceptor` from pico-ioc for AOP validation
-- `@intercepted_by` is NOT used directly - the interceptor is globally registered
+- `@validate` uses `@intercepted_by(ValidationInterceptor)` to attach to the AOP chain
 - Auto-discovered via `pico_boot.modules` entry point
 
 ## Key Reminders

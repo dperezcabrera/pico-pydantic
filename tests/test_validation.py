@@ -73,50 +73,50 @@ def test_validation_failed_error_message():
 async def test_invoke_transforms_dict_to_model(interceptor):
     valid_data = {"id": 1, "name": "Transformation"}
 
-    ctx = MockMethodCtx(cls=TestService, name="simple_method", args=(Mock(spec=TestService), valid_data), kwargs={})
+    ctx = MockMethodCtx(cls=TestService, name="simple_method", args=(valid_data,), kwargs={})
 
     async def call_next(context):
         service = TestService()
-        return service.simple_method(*context.args[1:], **context.kwargs)
+        return service.simple_method(context.args[0], **context.kwargs)
 
     result = await interceptor.invoke(ctx, call_next)
 
     assert result is True
-    assert isinstance(ctx.args[1], Item)
+    assert isinstance(ctx.args[0], Item)
 
 
 @pytest.mark.asyncio
 async def test_invoke_handles_list_generics(interceptor):
     valid_list = [{"id": 1, "name": "A"}, {"id": 2, "name": "B"}]
 
-    ctx = MockMethodCtx(cls=TestService, name="list_method", args=(Mock(spec=TestService), valid_list), kwargs={})
+    ctx = MockMethodCtx(cls=TestService, name="list_method", args=(valid_list,), kwargs={})
 
     async def call_next(context):
         service = TestService()
-        return service.list_method(*context.args[1:])
+        return service.list_method(context.args[0])
 
     result = await interceptor.invoke(ctx, call_next)
     assert result is True
-    assert isinstance(ctx.args[1], list)
-    assert isinstance(ctx.args[1][0], Item)
+    assert isinstance(ctx.args[0], list)
+    assert isinstance(ctx.args[0][0], Item)
 
 
 @pytest.mark.asyncio
 async def test_invoke_handles_optional_none(interceptor):
-    ctx = MockMethodCtx(cls=TestService, name="optional_method", args=(Mock(spec=TestService), None), kwargs={})
+    ctx = MockMethodCtx(cls=TestService, name="optional_method", args=(None,), kwargs={})
 
     call_next = AsyncMock(return_value=True)
     await interceptor.invoke(ctx, call_next)
-    assert ctx.args[1] is None
+    assert ctx.args[0] is None
 
 
 @pytest.mark.asyncio
 async def test_invoke_handles_optional_value(interceptor):
     valid_data = {"id": 1, "name": "Optional"}
-    ctx = MockMethodCtx(cls=TestService, name="optional_method", args=(Mock(spec=TestService), valid_data), kwargs={})
+    ctx = MockMethodCtx(cls=TestService, name="optional_method", args=(valid_data,), kwargs={})
 
     async def call_next(context):
-        return isinstance(context.args[1], Item)
+        return isinstance(context.args[0], Item)
 
     result = await interceptor.invoke(ctx, call_next)
     assert result is True
@@ -125,10 +125,10 @@ async def test_invoke_handles_optional_value(interceptor):
 @pytest.mark.asyncio
 async def test_invoke_handles_union_types(interceptor):
     valid_data = {"id": 1, "name": "Union"}
-    ctx = MockMethodCtx(cls=TestService, name="union_method", args=(Mock(spec=TestService), valid_data), kwargs={})
+    ctx = MockMethodCtx(cls=TestService, name="union_method", args=(valid_data,), kwargs={})
 
     async def call_next(context):
-        return isinstance(context.args[1], Item)
+        return isinstance(context.args[0], Item)
 
     result = await interceptor.invoke(ctx, call_next)
     assert result is True
@@ -140,11 +140,11 @@ async def test_invoke_skips_non_pydantic_args(interceptor):
     non_pydantic = NonPydanticArg()
 
     ctx = MockMethodCtx(
-        cls=TestService, name="mixed_method", args=(Mock(spec=TestService), valid_item, non_pydantic), kwargs={}
+        cls=TestService, name="mixed_method", args=(valid_item, non_pydantic), kwargs={}
     )
 
     async def call_next(context):
-        return isinstance(context.args[1], Item) and context.args[2] is non_pydantic
+        return isinstance(context.args[0], Item) and context.args[1] is non_pydantic
 
     result = await interceptor.invoke(ctx, call_next)
     assert result is True
@@ -154,7 +154,7 @@ async def test_invoke_skips_non_pydantic_args(interceptor):
 async def test_invoke_raises_error_on_invalid_data(interceptor):
     invalid_data = {"id": -5, "name": "Invalid"}
 
-    ctx = MockMethodCtx(cls=TestService, name="simple_method", args=(Mock(spec=TestService), invalid_data), kwargs={})
+    ctx = MockMethodCtx(cls=TestService, name="simple_method", args=(invalid_data,), kwargs={})
 
     call_next = Mock()
 
@@ -169,7 +169,7 @@ async def test_invoke_raises_error_on_invalid_data(interceptor):
 async def test_invoke_raises_error_inside_list(interceptor):
     invalid_list = [{"id": 1, "name": "Ok"}, {"id": -1, "name": "Bad"}]
 
-    ctx = MockMethodCtx(cls=TestService, name="list_method", args=(Mock(spec=TestService), invalid_list), kwargs={})
+    ctx = MockMethodCtx(cls=TestService, name="list_method", args=(invalid_list,), kwargs={})
 
     call_next = Mock()
 
@@ -180,14 +180,14 @@ async def test_invoke_raises_error_inside_list(interceptor):
 @pytest.mark.asyncio
 async def test_invoke_skips_undecorated_methods(interceptor):
     ctx = MockMethodCtx(
-        cls=TestService, name="non_validated", args=(Mock(spec=TestService), {"bad": "data"}), kwargs={}
+        cls=TestService, name="non_validated", args=({"bad": "data"},), kwargs={}
     )
 
     call_next = AsyncMock(return_value=True)
     await interceptor.invoke(ctx, call_next)
 
     call_next.assert_called_once()
-    assert ctx.args[1] == {"bad": "data"}
+    assert ctx.args[0] == {"bad": "data"}
 
 
 @pytest.mark.asyncio
@@ -195,13 +195,13 @@ async def test_invoke_handles_kwargs_transformation(interceptor):
     valid_data = {"id": 99, "name": "Kwargs"}
 
     ctx = MockMethodCtx(
-        cls=TestService, name="simple_method", args=(Mock(spec=TestService),), kwargs={"item": valid_data}
+        cls=TestService, name="simple_method", args=(), kwargs={"item": valid_data}
     )
 
     async def call_next(context):
         item_arg = context.kwargs.get("item")
-        if item_arg is None and len(context.args) > 1:
-            item_arg = context.args[1]
+        if item_arg is None and len(context.args) > 0:
+            item_arg = context.args[0]
 
         return isinstance(item_arg, Item)
 

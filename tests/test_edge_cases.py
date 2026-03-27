@@ -40,37 +40,35 @@ class ComplexService:
 
 @pytest.mark.asyncio
 async def test_validation_handles_list_types(interceptor):
-    # Changed from "ignores" to "handles"
     raw_data = [{"id": 1, "name": "valid"}, {"id": 2, "name": "valid"}]
-    ctx = MockMethodCtx(cls=ComplexService, name="process_list", args=(Mock(spec=ComplexService), raw_data), kwargs={})
+    ctx = MockMethodCtx(cls=ComplexService, name="process_list", args=(raw_data,), kwargs={})
     call_next = Mock(return_value=2)
 
     await interceptor.invoke(ctx, call_next)
 
-    assert isinstance(ctx.args[1], list)
-    # FIX: Now we expect Pydantic Models, not dicts
-    assert isinstance(ctx.args[1][0], Item)
-    assert ctx.args[1][0].id == 1
+    assert isinstance(ctx.args[0], list)
+    assert isinstance(ctx.args[0][0], Item)
+    assert ctx.args[0][0].id == 1
 
 
 @pytest.mark.asyncio
 async def test_validation_handles_optional_types(interceptor):
     raw_data = {"id": 1, "name": "valid"}
     ctx = MockMethodCtx(
-        cls=ComplexService, name="process_optional", args=(Mock(spec=ComplexService), raw_data), kwargs={}
+        cls=ComplexService, name="process_optional", args=(raw_data,), kwargs={}
     )
     call_next = Mock(return_value=True)
 
     await interceptor.invoke(ctx, call_next)
 
-    assert isinstance(ctx.args[1], Item)
-    assert ctx.args[1].name == "valid"
+    assert isinstance(ctx.args[0], Item)
+    assert ctx.args[0].name == "valid"
 
 
 @pytest.mark.asyncio
 async def test_class_method_binding(interceptor):
     valid_item = Item(id=10, name="ClassMethod")
-    ctx = MockMethodCtx(cls=ComplexService, name="class_method_op", args=(ComplexService, valid_item), kwargs={})
+    ctx = MockMethodCtx(cls=ComplexService, name="class_method_op", args=(valid_item,), kwargs={})
     call_next = Mock(return_value=True)
 
     await interceptor.invoke(ctx, call_next)

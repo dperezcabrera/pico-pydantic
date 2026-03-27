@@ -205,7 +205,15 @@ class ValidationInterceptor(MethodInterceptor):
                 ``ValidationFailedError``.
         """
         sig = inspect.signature(func)
-        bound = _bind_arguments(sig, args, kwargs)
+        # Strip 'self'/'cls' from signature — the AOP proxy doesn't include
+        # the instance in ctx.args, but test mocks might.
+        params = [v for k, v in sig.parameters.items() if k not in ("self", "cls")]
+        sig = sig.replace(parameters=params)
+        try:
+            bound = sig.bind(*args, **kwargs)
+        except TypeError:
+            # Fallback: args may still include self (e.g. in test mocks)
+            bound = sig.bind(*args[1:], **kwargs)
         bound.apply_defaults()
 
         validated_args_map = bound.arguments.copy()

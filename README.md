@@ -120,8 +120,8 @@ if __name__ == "__main__":
 
 ## ⚙️ How It Works
 
-  * The **`ValidationInterceptor`** is globally registered with Pico-IoC.
-  * When a method decorated with **`@validate`** is called:
+  * The **`@validate`** decorator attaches `ValidationInterceptor` to the method's AOP chain via `@intercepted_by`.
+  * When the method is called:
   * The interceptor captures the call arguments.
   * It inspects the method signature for arguments with the **`BaseModel`** type hint.
   * It validates each argument using **`TypeAdapter.validate_python(value)`**.

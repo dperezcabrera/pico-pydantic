@@ -89,4 +89,6 @@ def validate(func: T) -> T:
         ...         return data.model_dump()
     """
     setattr(func, VALIDATE_META, True)
-    return func
+    from pico_ioc import intercepted_by
+    from .interceptor import ValidationInterceptor
+    return intercepted_by(ValidationInterceptor)(func)
