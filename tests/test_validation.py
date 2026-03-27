@@ -139,9 +139,7 @@ async def test_invoke_skips_non_pydantic_args(interceptor):
     valid_item = {"id": 1, "name": "Mixed"}
     non_pydantic = NonPydanticArg()
 
-    ctx = MockMethodCtx(
-        cls=TestService, name="mixed_method", args=(valid_item, non_pydantic), kwargs={}
-    )
+    ctx = MockMethodCtx(cls=TestService, name="mixed_method", args=(valid_item, non_pydantic), kwargs={})
 
     async def call_next(context):
         return isinstance(context.args[0], Item) and context.args[1] is non_pydantic
@@ -179,9 +177,7 @@ async def test_invoke_raises_error_inside_list(interceptor):
 
 @pytest.mark.asyncio
 async def test_invoke_skips_undecorated_methods(interceptor):
-    ctx = MockMethodCtx(
-        cls=TestService, name="non_validated", args=({"bad": "data"},), kwargs={}
-    )
+    ctx = MockMethodCtx(cls=TestService, name="non_validated", args=({"bad": "data"},), kwargs={})
 
     call_next = AsyncMock(return_value=True)
     await interceptor.invoke(ctx, call_next)
@@ -194,9 +190,7 @@ async def test_invoke_skips_undecorated_methods(interceptor):
 async def test_invoke_handles_kwargs_transformation(interceptor):
     valid_data = {"id": 99, "name": "Kwargs"}
 
-    ctx = MockMethodCtx(
-        cls=TestService, name="simple_method", args=(), kwargs={"item": valid_data}
-    )
+    ctx = MockMethodCtx(cls=TestService, name="simple_method", args=(), kwargs={"item": valid_data})
 
     async def call_next(context):
         item_arg = context.kwargs.get("item")

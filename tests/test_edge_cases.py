@@ -54,9 +54,7 @@ async def test_validation_handles_list_types(interceptor):
 @pytest.mark.asyncio
 async def test_validation_handles_optional_types(interceptor):
     raw_data = {"id": 1, "name": "valid"}
-    ctx = MockMethodCtx(
-        cls=ComplexService, name="process_optional", args=(raw_data,), kwargs={}
-    )
+    ctx = MockMethodCtx(cls=ComplexService, name="process_optional", args=(raw_data,), kwargs={})
     call_next = Mock(return_value=True)
 
     await interceptor.invoke(ctx, call_next)
