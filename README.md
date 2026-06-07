@@ -171,7 +171,7 @@ curl -sL https://raw.githubusercontent.com/dperezcabrera/pico-skills/main/instal
 |---------|-------------|
 | `/add-validation` | Add Pydantic validation to component methods |
 | `/add-component` | Add components, factories, interceptors, settings |
-| `/add-tests` | Generate tests for pico-framework components |
+| `/add-tests` | Generate tests for pico components |
 
 All skills: `curl -sL https://raw.githubusercontent.com/dperezcabrera/pico-skills/main/install.sh | bash`
 
