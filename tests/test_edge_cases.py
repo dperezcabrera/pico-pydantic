@@ -38,48 +38,44 @@ class ComplexService:
         return True
 
 
-@pytest.mark.asyncio
-async def test_validation_handles_list_types(interceptor):
+def test_validation_handles_list_types(interceptor):
     raw_data = [{"id": 1, "name": "valid"}, {"id": 2, "name": "valid"}]
     ctx = MockMethodCtx(cls=ComplexService, name="process_list", args=(raw_data,), kwargs={})
     call_next = Mock(return_value=2)
 
-    await interceptor.invoke(ctx, call_next)
+    interceptor.invoke(ctx, call_next)
 
     assert isinstance(ctx.args[0], list)
     assert isinstance(ctx.args[0][0], Item)
     assert ctx.args[0][0].id == 1
 
 
-@pytest.mark.asyncio
-async def test_validation_handles_optional_types(interceptor):
+def test_validation_handles_optional_types(interceptor):
     raw_data = {"id": 1, "name": "valid"}
     ctx = MockMethodCtx(cls=ComplexService, name="process_optional", args=(raw_data,), kwargs={})
     call_next = Mock(return_value=True)
 
-    await interceptor.invoke(ctx, call_next)
+    interceptor.invoke(ctx, call_next)
 
     assert isinstance(ctx.args[0], Item)
     assert ctx.args[0].name == "valid"
 
 
-@pytest.mark.asyncio
-async def test_class_method_binding(interceptor):
+def test_class_method_binding(interceptor):
     valid_item = Item(id=10, name="ClassMethod")
     ctx = MockMethodCtx(cls=ComplexService, name="class_method_op", args=(valid_item,), kwargs={})
     call_next = Mock(return_value=True)
 
-    await interceptor.invoke(ctx, call_next)
+    interceptor.invoke(ctx, call_next)
 
     call_next.assert_called_once()
 
 
-@pytest.mark.asyncio
-async def test_static_method_binding_failure_risk(interceptor):
+def test_static_method_binding_failure_risk(interceptor):
     valid_item = Item(id=11, name="StaticMethod")
     ctx = MockMethodCtx(cls=ComplexService, name="static_method_op", args=(valid_item,), kwargs={})
     call_next = Mock(return_value=True)
 
-    await interceptor.invoke(ctx, call_next)
+    interceptor.invoke(ctx, call_next)
 
     call_next.assert_called_once()
