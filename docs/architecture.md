@@ -1,4 +1,4 @@
-# 🛡️ Architecture Overview — pico-pydantic
+# Architecture Overview — pico-pydantic
 
 `pico-pydantic` is an integration layer that enforces **Runtime Type Safety** within the **Pico-IoC** container using **Pydantic** models.
 
@@ -218,16 +218,16 @@ It does *not* attempt to:
 
 Use **pico-pydantic** if your application needs:
 
-✔ **Strict Contracts:** You want to guarantee that a `User` object passed to `UserService` is valid.
-✔ **Clean Services:** You want to remove `.model_validate()` or `try/except ValidationError` blocks from your business logic.
-✔ **Fail-Fast Behavior:** You want execution to stop *before* the method body is entered if data is invalid.
-✔ **IoC Integration:** You are already using `pico-ioc` and want validation to feel native to the container.
+**Strict Contracts:** You want to guarantee that a `User` object passed to `UserService` is valid.
+**Clean Services:** You want to remove `.model_validate()` or `try/except ValidationError` blocks from your business logic.
+**Fail-Fast Behavior:** You want execution to stop *before* the method body is entered if data is invalid.
+**IoC Integration:** You are already using `pico-ioc` and want validation to feel native to the container.
 
 Avoid pico-pydantic if:
 
-✖ You are validating simple primitives (e.g., just an `int > 0`) without a Pydantic model (use standard `assert` or simple checks).
-✖ You need extremely high-performance loops (reflection adds a small overhead per call).
-✖ You are not using Pydantic models for your data structures.
+You are validating simple primitives (e.g., just an `int > 0`) without a Pydantic model (use standard `assert` or simple checks).
+You need extremely high-performance loops (reflection adds a small overhead per call).
+You are not using Pydantic models for your data structures.
 
 -----
 
