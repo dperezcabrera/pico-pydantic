@@ -1,4 +1,4 @@
-# 📦 pico-pydantic
+# pico-pydantic
 
 [![PyPI](https://img.shields.io/pypi/v/pico-pydantic.svg)](https://pypi.org/project/pico-pydantic/)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/dperezcabrera/pico-pydantic)
@@ -17,14 +17,14 @@
 
 It uses Pico-IoC's **`MethodInterceptor`** system to perform validation based on Pydantic **`BaseModel`** type hints **before** your method's business logic runs. This is the ideal tool for ensuring arguments passed between IoC-managed services are structurally correct.
 
-> 🐍 Requires Python 3.11+
-> 🧩 Works with Pydantic 2.0+
-> 🔄 Supports async and sync methods
-> 🧪 Enables unit testing of validation separate from business logic
+> Requires Python 3.11+
+> Works with Pydantic 2.0+
+> Supports async and sync methods
+> Enables unit testing of validation separate from business logic
 
 -----
 
-## 🎯 Why pico-pydantic
+## Why pico-pydantic
 
 While web frameworks handle validation at the HTTP boundary, business services often need to guarantee input integrity internally, especially when components are called from CLI tools, workers, or other services.
 
@@ -43,7 +43,7 @@ Pico-Pydantic provides:
 
 -----
 
-## 🧱 Core Features
+## Core Features
 
   * Method validation via **`@validate`** decorator.
   * **`ValidationInterceptor`** for AOP execution.
@@ -53,7 +53,7 @@ Pico-Pydantic provides:
 
 -----
 
-## 📦 Installation
+## Installation
 
 ```bash
 pip install pico-pydantic
@@ -61,7 +61,7 @@ pip install pico-pydantic
 
 -----
 
-## 🚀 Quick Example
+## Quick Example
 
 ### 1\. Define the Data Model and Service:
 
@@ -119,7 +119,7 @@ if __name__ == "__main__":
 
 -----
 
-## ⚙️ How It Works
+## How It Works
 
   * The **`@validate`** decorator attaches `ValidationInterceptor` to the method's AOP chain via `@intercepted_by`.
   * When the method is called:
@@ -133,7 +133,7 @@ No manual checks inside the service method. Logic stays clean.
 
 -----
 
-## 💡 Architecture Overview
+## Architecture Overview
 
 ```
                  ┌─────────────────────────────┐
@@ -179,7 +179,7 @@ See [pico-skills](https://github.com/dperezcabrera/pico-skills) for details.
 
 ---
 
-## 📝 License
+## License
 
 MIT
 
