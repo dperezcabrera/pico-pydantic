@@ -102,33 +102,25 @@ class TestRequiresPydanticValidation:
         assert result is False
 
 
-class TestCallNextAsync:
-    """Tests for _call_next_async."""
+class TestInvokePassthrough:
+    """invoke() is sync: plain results return directly, awaitables pass through."""
 
-    @pytest.mark.asyncio
-    async def test_handles_sync_result(self):
-        """Handles synchronous (non-awaitable) results."""
+    def test_sync_result_returned_directly(self):
         interceptor = ValidationInterceptor()
         ctx = Mock()
-
-        def sync_call_next(c):
-            return "sync_result"
-
-        result = await interceptor._call_next_async(ctx, sync_call_next)
-        assert result == "sync_result"
+        ctx.cls = object
+        ctx.name = "missing"
+        assert interceptor.invoke(ctx, lambda c: "sync_result") == "sync_result"
 
     @pytest.mark.asyncio
-    async def test_handles_async_result(self):
-        """Handles asynchronous (awaitable) results."""
+    async def test_awaitable_passes_through_untouched(self):
         interceptor = ValidationInterceptor()
         ctx = Mock()
+        ctx.cls = object
+        ctx.name = "missing"
 
         async def async_call_next(c):
             return "async_result"
 
-        # call_next returns a coroutine
-        def call_next_wrapper(c):
-            return async_call_next(c)
-
-        result = await interceptor._call_next_async(ctx, call_next_wrapper)
-        assert result == "async_result"
+        result = interceptor.invoke(ctx, lambda c: async_call_next(c))
+        assert await result == "async_result"

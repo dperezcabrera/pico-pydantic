@@ -7,7 +7,6 @@ This module implements the ``ValidationInterceptor``, a singleton
 
 Helper functions are extracted at module level to keep cyclomatic
 complexity low:
-    - ``_bind_arguments``: Binds positional/keyword args to a signature.
     - ``_should_skip_param``: Determines if a parameter should bypass validation.
     - ``_is_basemodel_class``: Checks if an annotation is a ``BaseModel`` subclass.
     - ``_has_pydantic_in_args``: Recursively checks generic ``__args__`` for
@@ -15,6 +14,7 @@ complexity low:
 """
 
 import inspect
+import logging
 from typing import Any, Callable
 
 from pico_ioc import MethodCtx, MethodInterceptor, component
@@ -22,33 +22,7 @@ from pydantic import BaseModel, TypeAdapter, ValidationError
 
 from .decorators import VALIDATE_META, ValidationFailedError
 
-
-def _bind_arguments(sig: inspect.Signature, args: tuple, kwargs: dict) -> inspect.BoundArguments:
-    """Bind positional and keyword arguments to a function signature.
-
-    Handles the discrepancy between how pico-ioc passes arguments (where
-    ``self`` may be included explicitly in ``args``) and how Python
-    normally binds them. If the initial bind fails with a ``TypeError``,
-    it retries without the first positional argument (assumed to be
-    ``self`` or ``cls``).
-
-    Args:
-        sig: The ``inspect.Signature`` of the target method.
-        args: Positional arguments passed to the method.
-        kwargs: Keyword arguments passed to the method.
-
-    Returns:
-        An ``inspect.BoundArguments`` instance mapping parameter names
-        to their values.
-
-    Raises:
-        TypeError: If binding fails even after removing the first
-            positional argument.
-    """
-    try:
-        return sig.bind(*args, **kwargs)
-    except TypeError:
-        return sig.bind(*args[1:], **kwargs)
+logger = logging.getLogger(__name__)
 
 
 def _should_skip_param(name: str, annotation: Any) -> bool:
@@ -146,40 +120,27 @@ class ValidationInterceptor(MethodInterceptor):
         >>> # await service.create({"name": "alice", "age": 30})
     """
 
-    async def invoke(self, ctx: MethodCtx, call_next: Callable[[MethodCtx], Any]) -> Any:
-        """Intercept a method call and validate arguments if marked.
-
-        This is the main entry point called by pico-ioc's interceptor
-        chain. If the target method has the ``@validate`` marker, its
-        arguments are validated and transformed before proceeding.
-
-        Args:
-            ctx: The method invocation context provided by pico-ioc,
-                containing the target class, method name, args, and kwargs.
-            call_next: Callable to invoke the next interceptor or the
-                actual method in the chain.
-
-        Returns:
-            The return value of the target method (or next interceptor).
+    def invoke(self, ctx: MethodCtx, call_next: Callable[[MethodCtx], Any]) -> Any:
+        """Validate marked arguments, then proceed. Sync and async methods
+        both work: validation is synchronous and happens before the call;
+        an async method's awaitable is returned untouched for the proxy to
+        await.
 
         Raises:
-            ValidationFailedError: If any argument with a ``BaseModel``
-                type hint fails Pydantic validation. Wraps the original
-                ``pydantic.ValidationError``.
+            ValidationFailedError: If a ``BaseModel``-typed argument fails
+                Pydantic validation.
         """
         original_func = getattr(ctx.cls, ctx.name, None)
 
-        if not original_func or not getattr(original_func, VALIDATE_META, False):
-            return await self._call_next_async(ctx, call_next)
+        if original_func and getattr(original_func, VALIDATE_META, False):
+            try:
+                new_args, new_kwargs = self._validate_and_transform(original_func, ctx.args, ctx.kwargs)
+                ctx.args = new_args
+                ctx.kwargs = new_kwargs
+            except ValidationError as e:
+                raise ValidationFailedError(ctx.name, e) from e
 
-        try:
-            new_args, new_kwargs = self._validate_and_transform(original_func, ctx.args, ctx.kwargs)
-            ctx.args = new_args
-            ctx.kwargs = new_kwargs
-        except ValidationError as e:
-            raise ValidationFailedError(ctx.name, e) from e
-
-        return await self._call_next_async(ctx, call_next)
+        return call_next(ctx)
 
     def _validate_and_transform(self, func: Callable, args: tuple, kwargs: dict) -> tuple[tuple, dict]:
         """Validate and transform method arguments using Pydantic.
@@ -238,10 +199,12 @@ class ValidationInterceptor(MethodInterceptor):
         whose ``__args__`` contain a ``BaseModel`` subclass. The check is
         recursive, so deeply nested generics are supported.
 
-        Any exception during the check (e.g., ``TypeError`` from
+        An exception during the check (e.g., ``TypeError`` from
         ``issubclass`` on special typing constructs, or broken
-        ``__args__`` iterators) is silently caught, and ``False`` is
-        returned.
+        ``__args__`` iterators) is caught and logged as a warning, and
+        ``False`` is returned — the argument is NOT validated. The log
+        makes the skip observable; silently skipping validation in a
+        validation library would hide real annotation bugs.
 
         Args:
             annotation: The type annotation to inspect.
@@ -254,25 +217,10 @@ class ValidationInterceptor(MethodInterceptor):
             if _is_basemodel_class(annotation):
                 return True
             return _has_pydantic_in_args(annotation, self._requires_pydantic_validation)
-        except Exception:
+        except Exception as exc:
+            logger.warning(
+                "pico-pydantic: could not inspect annotation %r (%s); skipping validation for it",
+                annotation,
+                exc,
+            )
             return False
-
-    async def _call_next_async(self, ctx: MethodCtx, call_next: Callable[[MethodCtx], Any]) -> Any:
-        """Invoke the next handler in the interceptor chain.
-
-        Supports both synchronous and asynchronous method implementations.
-        If ``call_next`` returns an awaitable (coroutine), it is awaited;
-        otherwise the result is returned directly.
-
-        Args:
-            ctx: The method invocation context.
-            call_next: Callable to invoke the next interceptor or the
-                actual method.
-
-        Returns:
-            The result of the next handler, whether sync or async.
-        """
-        res = call_next(ctx)
-        if inspect.isawaitable(res):
-            return await res
-        return res
