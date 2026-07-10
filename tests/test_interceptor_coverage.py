@@ -124,3 +124,32 @@ class TestInvokePassthrough:
 
         result = interceptor.invoke(ctx, lambda c: async_call_next(c))
         assert await result == "async_result"
+
+
+class TestValidateAndTransformArgs:
+    """_validate_and_transform binding edge cases."""
+
+    def test_args_including_self_use_fallback_bind(self):
+        from pydantic import BaseModel
+
+        class Item(BaseModel):
+            name: str
+
+        class Service:
+            def handle(self, item: Item) -> Item:
+                return item
+
+        interceptor = ValidationInterceptor()
+        instance = Service()
+        args, kwargs = interceptor._validate_and_transform(Service.handle, (instance, {"name": "x"}), {})
+        assert isinstance(args[0], Item)
+        assert args[0].name == "x"
+
+    def test_unannotated_params_are_skipped(self):
+        class Service:
+            def handle(self, raw) -> str:
+                return raw
+
+        interceptor = ValidationInterceptor()
+        args, kwargs = interceptor._validate_and_transform(Service.handle, ({"untouched": True},), {})
+        assert args[0] == {"untouched": True}
