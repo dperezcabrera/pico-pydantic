@@ -55,3 +55,5 @@ pip install pico-pydantic
 ## License
 
 MIT License - see LICENSE file for details.
+
+**See it in context**: the [flagship use case](https://dperezcabrera.github.io/pico-boot/flagship/) wires this module into a full order platform together with the rest of the ecosystem.
