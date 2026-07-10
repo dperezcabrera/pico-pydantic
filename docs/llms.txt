@@ -1,0 +1,20 @@
+# pico-pydantic
+
+> Seamless integration between Pico-IoC and Pydantic for configuration and validation
+
+## Docs
+
+- [Home](https://dperezcabrera.github.io/pico-pydantic/)
+- [Getting Started](https://dperezcabrera.github.io/pico-pydantic/getting-started/)
+- [Architecture](https://dperezcabrera.github.io/pico-pydantic/architecture/)
+- [API Reference](https://dperezcabrera.github.io/pico-pydantic/reference/)
+- [AI Coding Skills](https://dperezcabrera.github.io/pico-pydantic/skills/)
+- [FAQ](https://dperezcabrera.github.io/pico-pydantic/faq/)
+- [Troubleshooting](https://dperezcabrera.github.io/pico-pydantic/troubleshooting/)
+
+## For agents
+
+- [Full docs in one file](https://dperezcabrera.github.io/pico-pydantic/llms-full.txt)
+- [AGENTS.md (conventions and boundaries)](https://raw.githubusercontent.com/dperezcabrera/pico-pydantic/main/AGENTS.md)
+- [Flagship use case (whole ecosystem wired)](https://dperezcabrera.github.io/pico-boot/flagship/)
+- [PyPI](https://pypi.org/project/pico-pydantic/)
