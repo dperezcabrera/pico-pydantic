@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.h
 
 ---
 
+## [0.2.3] - 2026-07-12
+
+### Fixed
+- **`ValidationInterceptor.invoke` is synchronous again.** The async `invoke` in 0.2.2 broke `@validate` on sync methods (`RuntimeError: Async interceptor returned awaitable on sync method`). Validation is synchronous and runs before the call; an async method's awaitable is returned untouched for the proxy to await. Sync and async methods both work.
+
+---
+
 ## [0.2.2] - 2026-03-27
 
 ### Fixed
