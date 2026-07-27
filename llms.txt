@@ -1,0 +1,42 @@
+# pico-pydantic
+
+> Seamless integration between Pico-IoC and Pydantic for configuration and validation
+
+Install: `pip install pico-pydantic`. Import surface: `from pico_pydantic import ...`.
+
+## Usage
+
+```python
+from pydantic import BaseModel, Field
+from pico_ioc import component
+from pico_pydantic import validate
+
+class ItemData(BaseModel):
+    name: str = Field(min_length=3)
+    price: float = Field(gt=0)
+
+@component
+class InventoryService:
+    @validate
+    async def add_item(self, data: ItemData) -> dict:
+        # Validation happens BEFORE this line
+        print(f"Adding item: {data.name}")
+        return data.model_dump()
+```
+
+## Public API
+
+- `validate(func: T)` — Marker decorator that enables Pydantic validation on a method.
+- `class ValidationFailedError(ValueError)` — Exception raised when Pydantic validation fails on method arguments.
+- `class ValidationInterceptor(MethodInterceptor)` — AOP interceptor that validates method arguments against Pydantic schemas.
+
+## Docs
+
+- docs/architecture.md
+- docs/faq.md
+- docs/getting-started.md
+- docs/how-to/ (2 pages)
+- docs/reference/ (1 pages)
+- docs/releases/ (1 pages)
+- docs/skills.md
+- docs/troubleshooting.md
