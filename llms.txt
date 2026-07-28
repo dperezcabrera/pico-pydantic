@@ -37,6 +37,5 @@ class InventoryService:
 - docs/getting-started.md
 - docs/how-to/ (2 pages)
 - docs/reference/ (1 pages)
-- docs/releases/ (1 pages)
 - docs/skills.md
 - docs/troubleshooting.md
