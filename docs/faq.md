@@ -8,7 +8,7 @@ Pico-Pydantic provides AOP-based argument validation for pico-ioc managed compon
 
 ### What Python versions are supported?
 
-Pico-Pydantic requires Python 3.11 or later.
+Pico-Pydantic requires Python 3.11 or later. Every release is tested on 3.11, 3.12, 3.13 and 3.14.
 
 ### What Pydantic version is required?
 
