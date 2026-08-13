@@ -17,7 +17,7 @@
 
 It uses Pico-IoC's **`MethodInterceptor`** system to perform validation based on Pydantic **`BaseModel`** type hints **before** your method's business logic runs. This is the ideal tool for ensuring arguments passed between IoC-managed services are structurally correct.
 
-> Requires Python 3.11+
+> Requires Python 3.11+ (tested on 3.11, 3.12, 3.13 and 3.14)
 > Works with Pydantic 2.0+
 > Supports async and sync methods
 > Enables unit testing of validation separate from business logic
