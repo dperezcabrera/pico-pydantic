@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.h
 
 ## [Unreleased]
 
+## [0.2.4] - 2026-09-29
+
 ### Fixed
 
 - Dependency floors raised to what the test suite proves: `pico-ioc >= 2.3.3` (was 2.2.0). A new CI job runs the suite with every declared floor pinned, so a floor that installs but does not work can no longer ship.
